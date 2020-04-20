@@ -144,7 +144,7 @@ public class Genetic {
 	}
 
 	public void getError(){
-		error = -(getZ(0,0)/nvec) * error_porcentage;
+		error = -(getZ(0,0)/4) * error_porcentage;
 	}
 
 	public double getZ(double x, double y){
