@@ -7,11 +7,12 @@ import java.awt.event.ActionEvent;
 
 public class Genetic {
 	public double error_porcentage, error;
-	public double[][] ref;
-	public double[] limx, limy;
+	public double[][] ref, results;
+	public double[] limx, limy, optimus;
 	public int mx, my, press, nvec, nref, timeOut = 60000;
 	public Random rand;
 	public ArrayList<String> vectors;
+	public boolean greaterOptimus = false, iterating = false;
 
 
 	public Genetic(double[][] ref,int nvec ,double error_porcentage, int press){
@@ -20,6 +21,8 @@ public class Genetic {
 		this.press = press;
 		this.nvec = nvec;
 		this.error_porcentage = error_porcentage;
+		this.results = new double[nvec][3];
+		this.optimus = new double[4];
 		limx = new double[2];
 		limy = new double[2];
 		rand  = new Random();
@@ -42,6 +45,28 @@ public class Genetic {
 		limx[1] = xmax;
 		limy[0] = ymin;
 		limy[1] = ymax;
+	}
+
+	public double[] getOptimus(){
+		for(int i = 0; i < nvec; i++){
+			if(greaterOptimus){
+				if(results[i][2] > optimus[2]){
+					optimus[0] = results[i][0];
+					optimus[1] = results[i][1];
+					optimus[2] = results[i][2];
+					optimus[3] = i;
+				} 
+			}else{
+				if(results[i][2] < optimus[2]){
+					optimus[0] = results[i][0];
+					optimus[1] = results[i][1];
+					optimus[2] = results[i][2];
+					optimus[3] = i;
+				} 
+			}
+
+		}
+		return optimus;	
 	}
  
 	public static String toBase(String n, int b1, int b2){
@@ -92,8 +117,8 @@ public class Genetic {
 	}
 
 	public void iterate(int iterations){
+		iterating = true;
 		makeVectors();
-
 		try{
 			Thread t1 = new Thread(){
 				@Override
@@ -103,7 +128,6 @@ public class Genetic {
 					double[] zvalues = new double[nvec];
 					double[] zacum = new double[nvec];
 					double[] rands = new double[nvec];
-						
 					for(int k = 0; k < iterations; k++){
 						if(isInterrupted()){
 							System.out.println("Interrupted :"+getName());
@@ -111,14 +135,26 @@ public class Genetic {
 						}
 
 						for(int i = 0; i < nvec; i++){
+							if(isInterrupted()){
+								System.out.println("Interrupted :"+getName());
+								break;
+							}
 							String v = vectors.get(i);
 							double x = vecToX(v);
 							double y = vecToY(v);
 							zvalues[i] = getZ(x,y);	
 							zt += zvalues[i];
+							results[i][0] = x;
+							results[i][1] = y;
+							results[i][2] = zvalues[i];
+
 							str.add(i+" |"+v+" |"+x+" |"+y+" |"+zvalues[i]);
 						}
 						for(int i = 0; i < nvec; i++){
+							if(isInterrupted()){
+								System.out.println("Interrupted :"+getName());
+								break;
+							}
 							zp = zvalues[i]/zt;
 							zaux += zp;
 							zacum[i] = zaux;
@@ -126,6 +162,10 @@ public class Genetic {
 							str.set(i,str.get(i) + " |"+zp + " |"+ zaux+" |"+rands[i]);
 						}
 						for(int i = 0; i < nvec; i++){
+							if(isInterrupted()){
+								System.out.println("Interrupted :"+getName());
+								break;
+							}
 							int j = 0;
 							while(zacum[j] < rands[i]){
 								j++;
@@ -137,6 +177,10 @@ public class Genetic {
 						}
 						int len = sec.size();
 						while(len < nvec){
+							if(isInterrupted()){
+								System.out.println("Interrupted :"+getName());
+								break;
+							}
 							String vec = mutate(sec.get(0));
 							while(!isValid(vec)){
 								vec = mutate(sec.get(rand.nextInt(len)));
@@ -155,6 +199,7 @@ public class Genetic {
 						sec.clear();
 						str.clear();
 					}
+					iterating = false;
 				}
 			};
 			t1.start();
@@ -163,6 +208,7 @@ public class Genetic {
 				@Override
 				public void actionPerformed(ActionEvent e){
 					t1.interrupt();
+					iterating = false;
 					System.out.println("killed");
 				}
 			});
