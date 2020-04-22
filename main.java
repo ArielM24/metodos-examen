@@ -6,7 +6,10 @@ public class main {
 		double[] r4 = {5.2,-0.5,6.25};
 		double[][] ref = {r1,r2,r3,r4};
 
-		Genetic g = new Genetic(ref,100,0.05,4);
+		Genetic g = new Genetic(ref,50,0.05,4);
 		g.iterate(100);
+
+		Genetic g1 = new Genetic(ref,50,0.05,4);
+		g1.iterate(100);
 	}
 }
