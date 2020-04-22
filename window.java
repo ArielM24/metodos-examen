@@ -191,32 +191,16 @@ public class window extends JFrame {
 			gens.add(new Genetic(data,ind,error,4));
 			gens.get(i).iterate(ite);
 		}
-
-		
-		Thread t = new Thread(){
-			int sz = gens.size();
-
-			boolean iter = true;
-			@Override
-			public void run(){
-				iter = gens.get(sz-1).iterating;
-				while(iter){
-					iter = gens.get(sz-1).iterating;
-					try{
-						Thread.sleep(100*ite/2);
-					}catch(Exception ex){	
-						ex.printStackTrace();
-					}
-				}
-				String res = "";
-				for(int i = 0; i < sz; i++){
-					Genetic g = gens.get(i);
-					res += "Poblacion: "+i+" x: "+g.optimus[0]+" y: "+g.optimus[1]+" z: "+g.optimus[2]+"\n";
-				}
-				ta.setText(res);
-			}
-		};
-		t.start();
+		boolean aux = true;
+		int sz = gens.size();
+		String res = "";
+		long wait = 50*ite*pob/2;
+		for(int i = 0; i < sz; i++){
+			Genetic g = gens.get(i);
+			g.getOptimus();
+			res += "Poblacion: "+i+" x: "+g.optimus[0]+" y: "+g.optimus[1]+" z: "+g.optimus[2]+"\n";
+		}
+		ta.setText(res);
 	}
 
 	private void btnClrClick(){
@@ -238,5 +222,6 @@ public class window extends JFrame {
 		tfite.setText("");
 		tfpob.setText("");
 		tfind.setText("");
+		ta.setText("");
 	}
 }

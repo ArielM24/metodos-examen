@@ -48,6 +48,7 @@ public class Genetic {
 	}
 
 	public double[] getOptimus(){
+		while(iterating){System.out.println("op");}
 		for(int i = 0; i < nvec; i++){
 			if(greaterOptimus){
 				if(results[i][2] > optimus[2]){
@@ -203,13 +204,20 @@ public class Genetic {
 				}
 			};
 			t1.start();
+			try{
+				t1.join();
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
 
 			Timer t = new Timer(timeOut, new ActionListener (){
 				@Override
 				public void actionPerformed(ActionEvent e){
-					t1.interrupt();
-					iterating = false;
-					System.out.println("killed");
+					if(iterating){
+						t1.interrupt();
+						iterating = false;
+						System.out.println("killed");
+					}
 				}
 			});
 			t.setRepeats(false);
@@ -218,6 +226,7 @@ public class Genetic {
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
+
 	}
 
 	public String mutate(String vector){
