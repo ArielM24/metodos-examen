@@ -8,7 +8,7 @@ public class main {
 			ex.printStackTrace();
 		}
 		window w = new window();
-		w.setBounds(0,0,700,350);
+		w.setBounds(0,0,700,400);
 		w.setLocationRelativeTo(null);
 		w.setResizable(false);
 		w.setVisible(true);
